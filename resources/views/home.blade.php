@@ -15,6 +15,18 @@
                     @endif
 
                     You are logged in!
+                    <script>
+                        jQuery(function() {
+                            console.log('start');
+                        axios.get('api/user')
+                            .then(function(response) {
+                            console.log(response.data);
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                            }
+                        );
+                    </script>
                 </div>
             </div>
         </div>
