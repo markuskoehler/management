@@ -15,6 +15,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//Auth::routes();
+
+Route::get('/auth0/callback', '\Auth0\Login\Auth0Controller@callback');
+
+$this->post('/auth/logout', 'Auth\LoginController@logout')->name('logout');
+
+Route::get('/auth/login', 'Auth\LoginController@login')->name('login');
 
 Route::get('/home', 'HomeController@index')->name('home');
