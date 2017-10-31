@@ -36,4 +36,9 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    public function login()
+    {
+        return app('auth0')->login(null, null, ['scope' => 'openid profile email name'], 'code');
+    }
 }
