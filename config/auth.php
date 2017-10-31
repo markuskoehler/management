@@ -66,7 +66,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'eloquent', // don't replace with auth0, to make it all work
             'model' => App\User::class,
         ],
 
