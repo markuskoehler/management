@@ -8,7 +8,7 @@ use Auth0\Login\Contract\Auth0UserRepository;
 class UserRepository implements Auth0UserRepository
 {
 
-    /* This class is used on api authN to fetch the user based on the jwt.*/
+    /* This class is used on api auth0 to fetch the user based on the jwt. */
     public function getUserByDecodedJWT($jwt)
     {
         $jwt = (object) $jwt;
@@ -28,11 +28,11 @@ class UserRepository implements Auth0UserRepository
         $user = User::where("auth0id", $profile->sub)->first();
 
         if ($user === null) {
-            // If not, create one
+            // If not, create one // name & email scopes needed
             $user = new User();
-            $user->email = $profile->email; // you should ask for the email scope
+            $user->email = $profile->email;
             $user->auth0id = $profile->sub;
-            $user->name = $profile->name; // you should ask for the name scope
+            $user->name = $profile->name;
             $user->password = md5(time());
             $user->save();
         }
@@ -42,7 +42,7 @@ class UserRepository implements Auth0UserRepository
 
     public function getUserByIdentifier($identifier)
     {
-        //Get the user info of the user logged in (probably in session)
+        // Get the user info of the user logged in (probably in session)
         $user = app('auth0')->getUser();
 
         if ($user === null) return null;
@@ -50,7 +50,7 @@ class UserRepository implements Auth0UserRepository
         // build the user
         $user = $this->getUserByUserInfo($user);
 
-        // it is not the same user as logged in, it is not valid
+        // if it is not the same user as logged in, it is not valid
         if ($user && $user->auth0id == $identifier) {
             return $user;
         }
