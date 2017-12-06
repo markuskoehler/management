@@ -15,6 +15,9 @@
                     @endif
 
                     You are logged in!
+
+                    {{dd(app(\App\Markuskoehler\Billomat\Incomings::class)->get())}}
+
                     <script>
                         jQuery(function() {
                             console.log('start');
