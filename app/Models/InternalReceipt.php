@@ -12,11 +12,4 @@ class InternalReceipt extends Model
 	 * @var string
 	 */
 	protected $connection = 'internalreceipt';
-
-	/**
-	 * The table associated with the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'internal_receipts';
 }
