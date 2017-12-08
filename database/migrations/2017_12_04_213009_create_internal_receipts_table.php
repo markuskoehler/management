@@ -13,7 +13,7 @@ class CreateInternalReceiptsTable extends Migration
      */
     public function up()
     {
-        Schema::create('internal_receipts', function (Blueprint $table) {
+        Schema::connection('internalreceipt')->create('internal_receipts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('serial_no');
             $table->string('creditor_name');
@@ -35,6 +35,6 @@ class CreateInternalReceiptsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('internal_receipts');
+        Schema::connection('internalreceipt')->dropIfExists('internal_receipts');
     }
 }
