@@ -23,4 +23,10 @@ Route::post('/auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/auth/login', 'Auth\LoginController@login')->name('login');
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
+
+// ---
+// Internal Receipts
+// ---
+
+Route::resource('/internalreceipts', 'InternalReceiptController')->middleware('auth');
