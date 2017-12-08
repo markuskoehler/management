@@ -41,12 +41,12 @@ class InternalReceiptController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\InternalReceipt  $internalReceipt
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(InternalReceipt $internalReceipt)
+    public function show($id)
     {
-        return view('internalreceipt.show', ['internalreceipt' => $internalReceipt]);
+        return view('internalreceipt.show', ['internalreceipt' => InternalReceipt::find($id)]);
     }
 
     /**
