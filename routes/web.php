@@ -20,6 +20,7 @@ Route::get('/', function () {
 Route::get('/auth0/callback', '\Auth0\Login\Auth0Controller@callback');
 
 Route::post('/auth/logout', 'Auth\LoginController@logout')->name('logout');
+//Route::get('/auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/auth/login', 'Auth\LoginController@login')->name('login');
 
