@@ -16,6 +16,7 @@
 
                     You are logged in!
 
+                        {{dd(DB::connection('internalreceipt')->select('SELECT * FROM migrations'))}}
                     {{dd(app(\App\Markuskoehler\Billomat\Incomings::class)->get())}}
 
                     <script>
