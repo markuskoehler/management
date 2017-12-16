@@ -31,3 +31,4 @@ Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
 // ---
 
 Route::resource('/internalreceipts', 'InternalReceiptController')->middleware('auth');
+Route::get('/internalreceipts/{id}/pdf', 'InternalReceiptController@generatePdf')->name('internalreceipts.pdf')->middleware('auth');
