@@ -1,103 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
+    Create
+
     <table class="table">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Receipt No.</th>
-            <th>Creditor &amp; Address</th>
+            {{--<th>ID</th>--}}
+            <th width="100px">Receipt No.<br>Date of <abbr title="Expenditure">Exp.</abbr></th>
+            <th width="200px">Creditor &amp; Address</th>
             <th>Type of Expenditure</th>
-            <th>Date of Expenditure</th>
-            <th>Costs</th>
-            <th>Reason</th>
+            <th width="100px">Costs</th>
+            <th width="190px">Reason</th>
+            <th width="130px">Actions</th>
         </tr>
         </thead>
         <tbody>
     @foreach($internalreceipts as $internalreceipt)
         <tr>
-            <td>{{ $internalreceipt->id }}</td>
-            <td>{{ date('Y', strtotime($internalreceipt->expenditure_date)) . '-' . str_pad($internalreceipt->serial_no, 3, '0', STR_PAD_LEFT) }}</td>
-            <td>{{ $internalreceipt->creditor_name }}<br>
-                @empty($internalreceipt->creditor_address_1)
-                @else
-                    {{ $internalreceipt->creditor_address_1 }}<br>
-                @endempty
-                {{ $internalreceipt->creditor_address_2 }}<br>
-                {{ $internalreceipt->creditor_place }}
-            </td>
+            {{--<td>{{ $internalreceipt->id }}</td>--}}
+            <td>{{ date('Y', strtotime($internalreceipt->expenditure_date)) . '-' . str_pad($internalreceipt->serial_no, 3, '0', STR_PAD_LEFT) }}<br>
+                {{ $internalreceipt->expenditure_date }}</td>
+            <td>{!! nl2br(app(\App\Markuskoehler\Billomat\Creditors::class)->get($internalreceipt->billomat_supplier_id)->address) !!}</td>
             <td>{{ $internalreceipt->expenditure_type }}</td>
-            <td>{{ $internalreceipt->expenditure_date }}</td>
-            <td>{{ $internalreceipt->expenditure_costs }} EUR</td>
+            <td>{{ number_format($internalreceipt->expenditure_costs, 2, ',', '.') . ' EUR' }}</td>
             <td>{{ $internalreceipt->reason }}</td>
+            <td><div class="row">
+                    <div class="col-md-4"><a href="{{url()->route('internalreceipts.show', ['id' => $internalreceipt->id])}}" class="btn"><i class="fa fa-eye" aria-hidden="true"></i></a></div>
+                    <div class="col-md-4"><a disabled class="btn"><i class="fa fa-pencil" aria-hidden="true"></i></a></div>
+                    <div class="col-md-4"><a disabled class="btn"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>
+                </div>
+                <a href="{{url()->route('internalreceipts.pdf', ['id' => $internalreceipt->id])}}" class="btn btn-sm"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>&nbsp;
+                    @if(!is_null($internalreceipt->unsigned_document))
+                        View PDF
+                    @else
+                        Generate PDF
+                    @endif
+</a><br>
+                    @if(!is_null($internalreceipt->signed_document))
+                        <a href="{{url()->route('internalreceipts.signed', ['id' => $internalreceipt->id])}}" class="btn btn-sm"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;View Signed</a>
+                    @else
+                        <a onclick="document.getElementById('selectedFile{{$internalreceipt->id}}').click();" class="btn btn-sm"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;Upload Signed</a>
+                    <form action="{{url()->route('internalreceipts.store', ['id' => $internalreceipt->id])}}" method="POST" enctype="multipart/form-data" id="form{{$internalreceipt->id}}">
+                        {{ csrf_field() }}
+                        <input type="file" onchange="document.getElementById('form{{$internalreceipt->id}}').submit();" id="selectedFile{{$internalreceipt->id}}" name="selectedFile" style="display: none;" />
+                    </form>
+                    @endif
+</td>
         </tr>
     @endforeach
         </tbody>
     </table>
-
-{{--
-    @php
-    # This example demonstrates creating a PDF using common options and saving it
-    # to a place on the filesystem.
-    #
-    # It is created asynchronously, which means DocRaptor will render it for up to
-    # 10 minutes. This is useful when creating many documents in parallel, or very
-    # large documents with lots of assets.
-    #
-    # DocRaptor supports many options for output customization, the full list is
-    # https://docraptor.com/documentation/api#api_general
-    #
-    # You can run this example with: php async.rb
-
-    $configuration = DocRaptor\Configuration::getDefaultConfiguration();
-    //$configuration->setUsername("YOUR_API_KEY_HERE"); # this key works for test documents
-    $configuration->setUsername("qjB2fFVg5mWqigcZERY");
-    # $configuration->setDebug(true);
-    $docraptor = new DocRaptor\DocApi();
-    try {
-    $doc = new DocRaptor\Doc();
-    $doc->setTest(false);                                                   # test documents are free but watermarked
-    $doc->setDocumentContent("<html><body>Hello World</body></html>");     # supply content directly
-    # $doc->setDocumentUrl("http://docraptor.com/examples/invoice.html");  # or use a url
-    $doc->setName("docraptor-php.pdf");                                    # help you find a document later
-    $doc->setDocumentType("pdf");                                          # pdf or xls or xlsx
-    # $doc->setJavascript(true);                                           # enable JavaScript processing
-    # $prince_options = new DocRaptor\PrinceOptions();                     # pdf-specific options
-    # $doc->setPrinceOptions($prince_options);
-    # $prince_options->setMedia("screen");                                 # use screen styles instead of print styles
-    # $prince_options->setBaseurl("http://hello.com");                     # pretend URL when using document_content
-    $create_response = $docraptor->createAsyncDoc($doc);
-    $done = false;
-    while (!$done) {
-    $status_response = $docraptor->getAsyncDocStatus($create_response->getStatusId());
-    //echo "doc status: " . $status_response->getStatus() . "\n";
-    switch ($status_response->getStatus()) {
-    case "completed":
-    $doc_response = $docraptor->getAsyncDoc($status_response->getDownloadId());
-    $temp_file = tempnam(sys_get_temp_dir(), 'tmp');
-    $file = fopen($temp_file, "wb");
-    fwrite($file, $doc_response);
-    fclose($file);
-    Storage::disk('spaces')->putFile('management/internalreceipts', new Illuminate\Http\File($temp_file));
-    unlink($temp_file);
-    echo "Wrote PDF\n";
-    $done = true;
-    break;
-    case "failed":
-    echo "FAILED\n";
-    echo $status_response;
-    $done = true;
-    break;
-    default:
-    sleep(1);
-    }
-    }
-    } catch (DocRaptor\ApiException $exception) {
-    echo $exception . "\n";
-    echo $exception->getMessage() . "\n";
-    echo $exception->getCode() . "\n";
-    echo $exception->getResponseBody() . "\n";
-    }
-    @endphp
-    --}}
 @endsection
