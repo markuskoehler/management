@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Markuskoehler\Billomat\Creditors;
 use App\Models\InternalReceipt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Log;
 
 class InternalReceiptController extends Controller
 {
@@ -46,7 +49,10 @@ class InternalReceiptController extends Controller
      */
     public function show($id)
     {
-        return view('internalreceipt.show', ['internalreceipt' => InternalReceipt::find($id)]);
+        return view('internalreceipt.show', [
+            'internalreceipt' => InternalReceipt::find($id),
+            'address' => app(Creditors::class)->get(InternalReceipt::find($id)->billomat_supplier_id)
+        ]);
     }
 
     /**
@@ -81,5 +87,27 @@ class InternalReceiptController extends Controller
     public function destroy(InternalReceipt $internalReceipt)
     {
         //
+    }
+
+    public function generatePdf($id) {
+        return view('internalreceipt.generate_pdf', [
+            'internalreceipt' => InternalReceipt::find($id),
+            'address' => app(Creditors::class)->get(InternalReceipt::find($id)->billomat_supplier_id)
+        ]);
+    }
+
+    public function storeSignedDoc(Request $request, $id) {
+        //Log::info("reached upload method");
+        $link = Storage::disk('spaces')->putFile('management/internalreceipts', $request->file('selectedFile'));
+        $internalreceipt = InternalReceipt::find($id);
+        $internalreceipt->signed_document = $link;
+        $internalreceipt->save();
+        return redirect()->back();
+    }
+
+    public function showSignedDoc(Request $request, $id) {
+        header("Content-type:application/pdf");
+        $internalreceipt = InternalReceipt::find($id);
+        return response(Storage::cloud()->get($internalreceipt->signed_document))->header('Content-Type', 'application/pdf');
     }
 }
