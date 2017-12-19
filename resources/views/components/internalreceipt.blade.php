@@ -13,8 +13,8 @@
                     Nr. {$fn(date('Y', strtotime($internalreceipt->expenditure_date)) . '-' . str_pad($internalreceipt->serial_no, 3, '0', STR_PAD_LEFT))}</td>
             </tr>
             <tr>
-                <td>Betrag (EURO, Cent):</td>
-                <td>{$fn(number_format($internalreceipt->expenditure_costs, 2, ',', '.') . ' EUR')}</td>
+                <td>Betrag:</td>
+                <td>{$fn(number_format($internalreceipt->expenditure_costs, 2, ',', '.') . ' ' . $internalreceipt->expenditure_currency)}</td>
             </tr>
             <tr>
                 <td width="33.3%">Empfänger:</td>

@@ -23,7 +23,7 @@
                 {{ $internalreceipt->expenditure_date }}</td>
             <td>{!! nl2br(app(\App\Markuskoehler\Billomat\Creditors::class)->get($internalreceipt->billomat_supplier_id)->address) !!}</td>
             <td>{{ $internalreceipt->expenditure_type }}</td>
-            <td>{{ number_format($internalreceipt->expenditure_costs, 2, ',', '.') . ' EUR' }}</td>
+            <td>{{ number_format($internalreceipt->expenditure_costs, 2, ',', '.') . ' ' . $internalreceipt->expenditure_currency }}</td>
             <td>{{ $internalreceipt->reason }}</td>
             <td><div class="row">
                     <div class="col-md-4"><a href="{{url()->route('internalreceipts.show', ['id' => $internalreceipt->id])}}" class="btn"><i class="fa fa-eye" aria-hidden="true"></i></a></div>
