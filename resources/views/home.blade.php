@@ -16,6 +16,9 @@
 
                     You are logged in!
 
+                        {{--dd(DB::connection('internalreceipt')->select('SELECT * FROM migrations'))--}}
+                        {{dd(Storage::disk('storagebox')->allFiles('/dump/'))}}
+                    {{dd(app(\App\Markuskoehler\Billomat\Creditors::class)->get())}}
                     {{dd(app(\App\Markuskoehler\Billomat\Incomings::class)->get())}}
 
                     <script>

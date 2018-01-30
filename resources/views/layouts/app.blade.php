@@ -44,7 +44,7 @@
             <div id="navbar" class="collapse navbar-collapse">
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
-                    &nbsp;
+                    &nbsp;<li><a href="{{url()->route('internalreceipts.index')}}">Internal Receipts</a></li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->
@@ -85,7 +85,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">Place sticky footer content here.</p>
+            <p class="text-muted"><br>Copyright &copy; 2017 by Markus Koehler IT Services. All Rights Reserved. Proudly implemented using billomat[API].</p>
         </div>
     </footer>
 
@@ -97,5 +97,7 @@
     <!-- jQuery & Bootstrap JS comes from app.js -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{asset('js/ie10-viewport-bug-workaround.js')}}"></script>
+
+    <script src="https://use.fontawesome.com/fbaa8fa942.js"></script>
 </body>
 </html>

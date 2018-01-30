@@ -20,7 +20,17 @@ Route::get('/', function () {
 Route::get('/auth0/callback', '\Auth0\Login\Auth0Controller@callback');
 
 Route::post('/auth/logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('/auth/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/auth/login', 'Auth\LoginController@login')->name('login');
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
+
+// ---
+// Internal Receipts
+// ---
+
+Route::resource('/internalreceipts', 'InternalReceiptController')->middleware('auth');
+Route::get('/internalreceipts/{id}/pdf', 'InternalReceiptController@generatePdf')->name('internalreceipts.pdf')->middleware('auth');
+Route::post('/internalreceipts/{id}/store', 'InternalReceiptController@storeSignedDoc')->name('internalreceipts.store')->middleware('auth');
+Route::get('/internalreceipts/{id}/signed', 'InternalReceiptController@showSignedDoc')->name('internalreceipts.signed')->middleware('auth');
