@@ -25,7 +25,6 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-body">
-
                 <div class="row">
                     <!-- statistics -->
                     <div class="col-md-2">
@@ -33,42 +32,45 @@
                         {{ stats.total }}
                     </div>
                     <div class="col-md-2">
-                        Unsorted
+                        <strong>Unsorted</strong><br>
+                        {{ stats.unsorted }}<br>
+                        {{ +(stats.unsorted / stats.total * 100).toFixed(2) || 0 }} %
                     </div>
                     <div class="col-md-2">
-                        Personal
+                        <strong>Personal</strong><br>
+                        {{ stats.personal }}<br>
+                        {{ +(stats.personal / stats.total * 100).toFixed(2) || 0 }} %
                     </div>
                     <div class="col-md-2">
-                        Business
+                        <strong>Business Invoice</strong><br>
+                        {{ stats.business_invoice }}<br>
+                        {{ +(stats.business_invoice / stats.total * 100).toFixed(2) || 0 }} %
                     </div>
                     <div class="col-md-2">
-                        Business Invoice
+                        <strong>Business</strong><br>
+                        {{ stats.business }}<br>
+                        {{ +(stats.business / stats.total * 100).toFixed(2) || 0 }} %
                     </div>
                     <div class="col-md-2">
-                        ...
+                        <strong>...</strong><br>
+
                     </div>
                 </div>
             </div>
         </div>
-        <!--<div class="row">
-            <div class="col-md-3">
-                Unsorted
-            </div>
-            <div class="col-md-3">
-                Personal Expense
-            </div>
-            <div class="col-md-3">
-                Business Expense + Invoice
-            </div>
-            <div class="col-md-3">
-                Business Expense w/o Invoice
-            </div>
-        </div>-->
         <div class="row">
-            <div class="col-md-3">Unsorted</div>
-            <div class="col-md-3">Personal Expense</div>
-            <div class="col-md-3">Business Expense + Invoice</div>
-            <div class="col-md-3">Business Expense w/o Invoice</div>
+            <div class="col-md-3" v-for="account in accounts">
+                <span :class="['circle', 'legend', stringToAlphaNumeric(account.bezeichnung)]"></span>
+                {{ account.bezeichnung }}
+            </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-md-3"><strong>Unsorted</strong></div>
+            <div class="col-md-3"><strong>Personal Expense</strong></div>
+            <div class="col-md-3"><strong>Business Expense + Invoice</strong></div>
+            <div class="col-md-3"><strong>Business Expense w/o Invoice</strong></div>
         </div>
 
         <grid-layout
@@ -81,6 +83,8 @@
                 :vertical-compact="true"
                 :margin="[10, 10]"
                 :use-css-transforms="true"
+                @layout-updated="layoutUpdatedEvent"
+                v-show="stats.total"
         >
             <grid-item v-for="item in testLayout"
                        :key="item.o.id"
@@ -89,22 +93,13 @@
                        :w="item.w"
                        :h="item.h"
                        :i="item.i"
-                       :id="'gi-' + item.o.id">
-                <!--<div class="row">
-                    <div class="col-md-4 datum">{{ item.o.datum }}</div>
-                    <div class="col-md-4 empfaenger">{{ item.o.empfaenger_name }}</div>
-                    <div :class="['col-md-4 betrag', item.o.betrag < 0 ? 'negative' : '']">{{ formatMoney(item.o.betrag)
-                        }} €
-                    </div>
-                </div>
+                       :id="'gi-' + item.o.id"
+                       :class="stringToAlphaNumeric(item.o.account.bezeichnung)"
+                       @moved="movedEvent">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true" v-if="item.o.todo"></i>
                 <div class="row">
-                    <div class="col-md-4 valuta">{{ item.o.valuta }}</div>
-                    <div class="col-md-4 zweck">{{ item.o.zweck }}{{ item.o.zweck2 }}{{ item.o.zweck3 }}</div>
-                    <div class="col-md-4 art">{{ item.o.art }}</div>
-                </div>-->
-                <div class="row">
-                    <div class="col-md-6 datum">{{ item.o.datum }}</div>
-                    <div class="col-md-6 valuta">{{ item.o.valuta }}</div>
+                    <div class="col-md-6 datum">{{ (new Date(item.o.datum)).toLocaleDateString("de-DE") }}</div>
+                    <div class="col-md-6 valuta">{{ (new Date(item.o.valuta)).toLocaleDateString("de-DE") }}</div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 empfaenger" :title="item.o.empfaenger_name">{{ item.o.empfaenger_name }}</div>
@@ -113,11 +108,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 zweck" :title="item.o.zweck + item.o.zweck2 + item.o.zweck3">{{ item.o.zweck }}{{ item.o.zweck2 }}{{ item.o.zweck3 }}</div>
+                    <div class="col-md-6 zweck"
+                         :title="item.o.zweck + ' ' + item.o.zweck2 + ' ' + item.o.zweck3 | prettifyZweck">{{
+                        item.o.zweck | prettifyZweck }} {{ item.o.zweck2 | prettifyZweck }} {{ item.o.zweck3 |
+                        prettifyZweck }}
+                    </div>
                     <div class="col-md-6 art" :title="item.o.art">{{ item.o.art }}</div>
                 </div>
             </grid-item>
         </grid-layout>
+        <div class="text-center" v-if="!stats.total">No records found</div>
     </div>
 </template>
 
@@ -137,9 +137,11 @@
                             onChange: function (option, checked, select) {
                                 //console.log('Changed option ' + $(option).val() + '.' + checked);
 
+                                vm.resetStats();
+
                                 if (checked) {
                                     vm.selected.accounts.push($(option).val());
-                                    console.log('added ' + $(option).val());
+                                    //console.log('added ' + $(option).val());
                                 }
                                 else {
                                     let index = vm.selected.accounts.indexOf($(option).val());
@@ -150,27 +152,35 @@
                                         //console.log('removed ' + $(option).val());
                                     }
 
-                                    if (!vm.selected.accounts.length) return;
+                                    if (!vm.selected.accounts.length) {
+                                        vm.testLayout = [];
+                                        return;
+                                    }
                                 }
 
                                 if (vm.selected.month !== '') {
                                     // start query
                                     vm.loadTransactions();
                                 } else {
-                                    // todo clear
+                                    vm.testLayout = [];
                                 }
                             }
                         });
                     }
                 );
+
+                // store class name and color per account
+                $.each(vm.accounts, function (i, o) {
+                    const name = vm.stringToAlphaNumeric(o.bezeichnung);
+                    const clr = vm.stringToColor(o.iban + o.bezeichnung + Math.random());
+                    $('<style>div.' + name + '{border-color:' + clr + ';} span.' + name + '{background-color:' + clr + '}</style>').appendTo('head');
+                });
             }).catch((error) => {
                 console.error(error);
                 alert(error);
             }).finally(() => {
                 this.loading = false;
             });
-
-
         },
         data() {
             return {
@@ -184,8 +194,8 @@
                     total: 0,
                     unsorted: 0,
                     personal: 0,
+                    business_invoice: 0,
                     business: 0,
-                    business_invoice: 0
                 },
                 testLayout: [
                     /*{"x": 0, "y": 0, "w": 1, "h": 1, "i": "0"},
@@ -218,26 +228,51 @@
             monthChange(e) {
                 //console.log('month changed to ');
                 //console.log(e.target.value);
+                this.resetStats();
 
                 if (this.selected.month !== '' && this.selected.accounts.length) {
                     // if any account selected
                     this.loadTransactions();
                 } else {
-                    // todo clear
+                    this.testLayout = [];
                 }
             },
             loadTransactions() {
                 this.loading = true;
                 axios.get(APP_URL + '/api/transactionassignment?month=' + this.selected.month + '&accounts=' + this.selected.accounts).then((response) => {
-                    console.log(response.data);
-
-                    // update stats
-                    this.stats.total = response.data.length;
+                    //console.log(response.data);
 
                     // update actual contents
                     this.testLayout = [];
                     $.each(response.data, (i, o) => {
-                        this.testLayout.push({"x": 0, "y": i, "w": 1, "h": 1, "i": i, "o": o});
+                        let category = this.randomIntFromInterval(0,3);//o.category;
+                        this.testLayout.push({"x": category, "y": i, "w": 1, "h": 1, "i": o.id, "o": o});
+                    });
+
+                    // calculate stats
+                    this.resetStats();
+
+                    this.stats.total = response.data.length;
+
+                    const vm = this;
+
+                    $.each(this.testLayout, function(i, o) {
+                        switch(o.x) {
+                            case 0:
+                                vm.stats.unsorted++;
+                                break;
+                            case 1:
+                                vm.stats.personal++;
+                                break;
+                            case 2:
+                                vm.stats.business_invoice++;
+                                break;
+                            case 3:
+                                vm.stats.business++;
+                                break;
+                            default:
+                                throw 'Error!';
+                        }
                     });
                 }).catch((error) => {
                     console.error(error);
@@ -254,12 +289,71 @@
                     j = (j = i.length) > 3 ? j % 3 : 0;
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
             },
-            prettifyZweck(value) {
-                return this.replaceAll(value, /(EREF\+|CRED\+|)/, '');
+            /*hashCode(str) { // java String#hashCode
+                var hash = 0;
+                for (var i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return hash;
             },
-            replaceAll(target, search, replacement) {
-                return target.replace(new RegExp(search, 'g'), replacement);
+            intToRGB(i) {
+                var c = (i & 0x00FFFFFF)
+                    .toString(16)
+                    .toUpperCase();
+
+                return "00000".substring(0, 6 - c.length) + c;
+            }*/
+            stringToColor(str) {
+                var hash = 0;
+                for (var i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                var colour = '#';
+                for (var i = 0; i < 3; i++) {
+                    var value = (hash >> (i * 8)) & 0xFF;
+                    colour += ('00' + value.toString(16)).substr(-2);
+                }
+                return colour;
+            },
+            stringToAlphaNumeric(input) {
+                return input.replace(/\W/g, '');
+            },
+            randomIntFromInterval(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            },
+            layoutUpdatedEvent(newLayout) {
+                console.log("Updated layout: ", newLayout)
+            },
+            movedEvent(i, newX, newY) {
+                console.log("MOVED i=" + i + ", X=" + newX + ", Y=" + newY);
+
+                // re-calculate stats
+                this.resetStats();
+
+
+
+                // todo just for testing
+                let pos = this.testLayout.map(function(e) { return e.i; }).indexOf(i);
+                if(newX == 3) {
+                    this.testLayout[pos].o.todo = true;
+                } else {
+                    this.testLayout[pos].o.todo = false;
+                }
+            },
+            resetStats() {
+                this.stats.total = 0;
+                this.stats.unsorted = 0;
+                this.stats.personal = 0;
+                this.stats.business_invoice = 0;
+                this.stats.business = 0;
             }
+        },
+        filters: {
+            prettifyZweck(value) {
+                //console.log(value);
+                if (value === null) return;
+                return value.replace(new RegExp(/(ABWA\+|EREF\+|MREF\+|CRED\+|SVWZ\+|null)/, 'g'), '');
+            },
         }
     }
 </script>
