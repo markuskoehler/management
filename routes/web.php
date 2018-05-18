@@ -34,3 +34,12 @@ Route::resource('/internalreceipts', 'InternalReceiptController')->middleware('a
 Route::get('/internalreceipts/{id}/pdf', 'InternalReceiptController@generatePdf')->name('internalreceipts.pdf')->middleware('auth');
 Route::post('/internalreceipts/{id}/store', 'InternalReceiptController@storeSignedDoc')->name('internalreceipts.store')->middleware('auth');
 Route::get('/internalreceipts/{id}/signed', 'InternalReceiptController@showSignedDoc')->name('internalreceipts.signed')->middleware('auth');
+
+// ---
+// Transaction Assignment
+// ---
+
+Route::resource('/transactionassignment', 'TransactionAssignmentController')->middleware('auth');
+//Route::get('/transactionassignment/{id}/pdf', 'TransactionAssignmentController@generatePdf')->name('transactionassignment.pdf')->middleware('auth');
+//Route::post('/transactionassignment/{id}/store', 'TransactionAssignmentController@storeSignedDoc')->name('transactionassignment.store')->middleware('auth');
+//Route::get('/transactionassignment/{id}/signed', 'TransactionAssignmentController@showSignedDoc')->name('transactionassignment.signed')->middleware('auth');
