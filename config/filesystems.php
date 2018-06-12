@@ -54,6 +54,19 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+
+        'storagebox' => [
+            'driver'   => 'sftp',
+            'host'     => env('HZ_STORAGEBOX_HOST'),
+            'port'     => env('HZ_STORAGEBOX_PORT', 22),
+            'username' => env('HZ_STORAGEBOX_USERNAME'),
+            'password' => env('HZ_STORAGEBOX_PASSWORD'),
+            //'privateKey' => 'path/to/or/contents/of/privatekey',
+            //'root' => '/path/to/root',
+            'timeout' => 10,
+            //'directoryPerm' => 0755
+        ],
+
         'spaces' => [
 	        'driver' => 's3',
 	        'key' => env('DO_SPACES_KEY'),

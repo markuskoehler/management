@@ -23,11 +23,13 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    @stack('head')
 </head>
 <body>
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
+    <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
@@ -36,6 +38,7 @@
                     <span class="icon-bar"></span>
                 </button>
 
+                <a href="{{ url('/') }}" class="navbar-left"><img src="{{ asset('images/mkit_all_your_web_needs.png') }}"></a>
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
@@ -44,18 +47,21 @@
             <div id="navbar" class="collapse navbar-collapse">
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
-                    &nbsp;
+                    <li class="divider-vertical"></li>
+                    &nbsp;<li><a href="{{url()->route('internalreceipts.index')}}">Internal Receipts</a></li>
+                     <li><a href="{{url()->route('transactionassignment.index')}}">Transaction Assignment</a></li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="divider-vertical"></li>
                     <!-- Authentication Links -->
                     @guest
                         <li><a href="{{ route('login') }}">Login</a></li>
                         @else
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
+                                    <img src="{{ app('auth0')->getUser()['profile']['picture'] }}" class="profile-image img-circle">&nbsp;{{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <ul class="dropdown-menu">
@@ -85,11 +91,14 @@
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">Place sticky footer content here.</p>
+            <p class="text-muted"><br>Copyright &copy; 2017 by Markus Koehler IT Services. All Rights Reserved. Proudly implemented using billomat[API].</p>
         </div>
     </footer>
 
     <!-- Scripts -->
+    <script>
+        const APP_URL = '{!! env('APP_URL') !!}';
+    </script>
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -97,5 +106,9 @@
     <!-- jQuery & Bootstrap JS comes from app.js -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{asset('js/ie10-viewport-bug-workaround.js')}}"></script>
+
+    <script src="https://use.fontawesome.com/fbaa8fa942.js"></script>
+
+    @stack('foot')
 </body>
 </html>

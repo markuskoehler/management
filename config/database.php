@@ -48,6 +48,36 @@ return [
             'engine' => null,
         ],
 
+        'internalreceipt' => [
+	        'driver' => 'mysql',
+	        'host' => env('IR_DB_HOST', '127.0.0.1'),
+	        'port' => env('IR_DB_PORT', '3306'),
+	        'database' => env('IR_DB_DATABASE', 'forge'),
+	        'username' => env('IR_DB_USERNAME', 'forge'),
+	        'password' => env('IR_DB_PASSWORD', ''),
+	        'unix_socket' => env('IR_DB_SOCKET', ''),
+	        'charset' => 'utf8mb4',
+	        'collation' => 'utf8mb4_unicode_ci',
+	        'prefix' => '',
+	        'strict' => true,
+	        'engine' => null,
+        ],
+
+        'hibiscus' => [
+            'driver' => 'mysql',
+            'host' => env('JH_DB_HOST', '127.0.0.1'),
+            'port' => env('JH_DB_PORT', '3306'),
+            'database' => env('JH_DB_DATABASE', 'forge'),
+            'username' => env('JH_DB_USERNAME', 'forge'),
+            'password' => env('JH_DB_PASSWORD', ''),
+            'unix_socket' => env('JH_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
     ],
 
     /*
