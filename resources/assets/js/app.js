@@ -16,6 +16,15 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('transaction-assignment', require('./components/TransactionAssignment.vue'));
+
+var VueGridLayout = require('vue-grid-layout');
+var loading = require('vue-loading-overlay');
+import 'vue-loading-overlay/dist/vue-loading.min.css';
+
+Vue.component('grid-layout', VueGridLayout.GridLayout);
+Vue.component('grid-item', VueGridLayout.GridItem);
+Vue.component('loading', loading);
 
 const app = new Vue({
     el: '#app'
